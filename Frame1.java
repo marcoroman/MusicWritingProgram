@@ -182,8 +182,6 @@ public class Frame1 {
 			public void run() {
 
 				int pitch = tm.getMIA(counter/16, counter%16);
-				if((counter%16!=0) && pitch == tm.getMIA(counter/16, (counter%16)-1))
-					pitch = 25;
 				
 				int volume = tm.getVolume(counter/16)+2;
 				System.out.println("Volume value is " + volume);
@@ -198,12 +196,13 @@ public class Frame1 {
 				}
 				else if (pitch != 25){
 					softClips[volume].get(pitch-1).setMicrosecondPosition(0);
-					softClips[volume].get(pitch-1).start();
 					if (softClips[volume].get(currentPosition).isRunning())
 					{
 						softClips[volume].get(currentPosition).setMicrosecondPosition(0);
 						softClips[volume].get(currentPosition).stop();
 					}
+					softClips[volume].get(pitch-1).start();
+					
 					currentPosition = pitch-1;
 				}
 				counter++;
