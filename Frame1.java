@@ -5,10 +5,7 @@ import javax.swing.JButton;
 import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import javax.swing.JTextField;
 import javax.swing.JLabel;
-import javax.swing.JSpinner;
-import java.awt.Choice;
 import javax.swing.JComboBox;
 
 public class Frame1 {
