@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.swing.JTextArea;
 
 public class Frame1 {
 
@@ -169,7 +170,7 @@ public class Frame1 {
 		
 		timer = new Timer();
 		initializeTimerTask();
-		timer.schedule(timerTask, 0, 1000);
+		timer.schedule(timerTask, 0, 800);
 		drums = AudioSystem.getClip();
 		drums.open(AudioSystem.getAudioInputStream(new File("C:\\EclipseWorkspace64\\Synthia\\sounds\\d.wav")));
 		drums.loop(Clip.LOOP_CONTINUOUSLY);
@@ -228,7 +229,7 @@ public class Frame1 {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 450, 353);
+		frame.setBounds(100, 100, 450, 405);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
@@ -458,10 +459,14 @@ public class Frame1 {
 			{	
 				for(int i = 0; i<seed.length; i++)
 				{
-					if(Integer.parseInt(value[i]) >= 0 && Integer.parseInt(value[i]) <= 7)
+					if(Integer.parseInt(value[i]) > 0 && Integer.parseInt(value[i]) <= 7)
 					{
 					seed[i] = Integer.parseInt(value[i]) + 7;
 					}
+					else if(Integer.parseInt(value[i])==25)
+						seed[i] = 25;
+					else if(Integer.parseInt(value[i])==0)
+						seed[i] = 0;
 					else
 						errorExists = true;
 				}
@@ -480,5 +485,12 @@ public class Frame1 {
 		});
 		btnAddCustomSeed.setBounds(61, 148, 300, 32);
 		frame.getContentPane().add(btnAddCustomSeed);
+		
+		JTextArea txtAuthors = new JTextArea();
+		txtAuthors.setFont(new Font("Monospaced", Font.BOLD, 13));
+		txtAuthors.setText(" Created by Thomas Dijulio, Marco Roman, Daniel Yap,\n         Duy Nguyen, and Abraham Yepremian.");
+		txtAuthors.setBounds(0, 315, 434, 52);
+		frame.getContentPane().add(txtAuthors);
+		
 	}
 }
