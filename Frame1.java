@@ -170,7 +170,7 @@ public class Frame1 {
 		
 		timer = new Timer();
 		initializeTimerTask();
-		timer.schedule(timerTask, 0, 800);
+		timer.schedule(timerTask, 0, 00);
 		drums = AudioSystem.getClip();
 		drums.open(AudioSystem.getAudioInputStream(new File("C:\\EclipseWorkspace64\\Synthia\\sounds\\d.wav")));
 		drums.loop(Clip.LOOP_CONTINUOUSLY);
