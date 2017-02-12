@@ -1,12 +1,25 @@
+import java.applet.Applet;
+import java.applet.AudioClip;
 import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.JButton;
 import java.awt.Font;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.net.URL;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 import javax.swing.JComboBox;
+import java.util.ArrayList;
+import java.applet.Applet;
+import java.applet.AudioClip;
+import java.net.URL;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Frame1 {
 
@@ -16,6 +29,9 @@ public class Frame1 {
 	private JLabel lblMiddleTension;
 	private JLabel lblEndingTension;
 	private JComboBox comboBox1, comboBox2, comboBox3;
+	
+	private static ArrayList<Clip> softClips;
+	
 
 	private String[] options = {"-7", "-6", "-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5", "6", "7"};
 	
@@ -24,12 +40,17 @@ public class Frame1 {
 	private JComboBox comboBox;
 	private JLabel lblSynthia;
 	private JButton btnGenerateplay;
+	private Timer timer;
+    private TimerTask timerTask;
+    private int currentPosition;
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
+	public static void main(String[] args) 
+	{
+		EventQueue.invokeLater(new Runnable() 
+		{
 			public void run() {
 				try {
 					Frame1 window = new Frame1();
@@ -38,12 +59,58 @@ public class Frame1 {
 					e.printStackTrace();
 				}
 			}
+			
+			
 		});
+		
+		//File file = new File("5.wav");
+		softClips = new ArrayList<>();
+		try{
+			for(int i = 0; i<12; i++)
+			{
+			Clip clip = AudioSystem.getClip();
+			clip.open(AudioSystem.getAudioInputStream(new File("C:\\EclipseWorkspace64\\Synthia\\sounds\\" + i + ".wav")));
+			softClips.add(clip);
+
+			Thread.sleep(clip.getMicrosecondLength()/1000);
+			}
+		} catch(Exception e) {
+			//error
+		}
+		//stringArray.add(new File("/Synthia/5.wav"));
+		
 	}
 
 	/**
 	 * Create the application.
 	 */
+	
+	public void startTimer(){
+        timer = new Timer();
+
+        initializeTimerTask();
+ 
+   	 	timer.schedule(timerTask, 500);
+    }
+	
+	public void initializeTimerTask() {
+        timerTask = new TimerTask() {
+        	
+            public void run() {
+            	
+        		Random rng = new Random();
+           	 	int randomPosition = rng.nextInt(softClips.size());
+           	 	if (softClips.get(currentPosition).isRunning())
+           	 		softClips.get(currentPosition).stop();
+
+           	 	softClips.get(randomPosition).start();
+           	 	currentPosition = randomPosition; 
+           	 
+            
+            }
+        };
+    }
+	
 	public Frame1() {
 		initialize();
 	}
@@ -185,6 +252,7 @@ public class Frame1 {
 		btnGenerateplay.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JOptionPane.showMessageDialog(null, "Beginning Tension is " + beginningTension + "\nMiddle Tension is " + middleTension + "\nEnding Tension is " + endingTension);
+				startTimer();
 			}
 		});
 		btnGenerateplay.setFont(new Font("Good Times Rg", Font.BOLD, 16));
