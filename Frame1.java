@@ -71,7 +71,8 @@ public class Frame1 {
 			Clip clip = AudioSystem.getClip();
 			clip.open(AudioSystem.getAudioInputStream(new File("C:\\EclipseWorkspace64\\Synthia\\sounds\\" + i + ".wav")));
 			softClips.add(clip);
-
+			//clip.start();
+			//JOptionPane.showMessageDialog(null, "It works");
 			Thread.sleep(clip.getMicrosecondLength()/1000);
 			}
 		} catch(Exception e) {
@@ -89,24 +90,25 @@ public class Frame1 {
         timer = new Timer();
 
         initializeTimerTask();
- 
-   	 	timer.schedule(timerTask, 500);
+
+        timer.schedule(timerTask, 0, 500);
     }
 	
 	public void initializeTimerTask() {
         timerTask = new TimerTask() {
-        	
-            public void run() {
-            	
-        		Random rng = new Random();
-           	 	int randomPosition = rng.nextInt(softClips.size());
-           	 	if (softClips.get(currentPosition).isRunning())
-           	 		softClips.get(currentPosition).stop();
 
-           	 	softClips.get(randomPosition).start();
-           	 	currentPosition = randomPosition; 
-           	 
-            
+            public void run() {
+            	 Random rng = new Random();
+                 int randomPosition = rng.nextInt(softClips.size());
+                   //if(currentPosition==randomPosition)
+                	  // softClips.get(currentPosition).setMicrosecondPosition(0);
+                 softClips.get(randomPosition).start();
+                 if (softClips.get(currentPosition).isRunning())
+                 {
+                	 softClips.get(currentPosition).setMicrosecondPosition(0);
+                     softClips.get(currentPosition).stop();
+                 }
+                 currentPosition = randomPosition;   
             }
         };
     }
