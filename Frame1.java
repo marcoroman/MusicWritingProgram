@@ -6,6 +6,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JButton;
 import java.awt.Font;
 import java.awt.event.ActionListener;
@@ -31,7 +33,7 @@ public class Frame1 {
 	private JLabel lblEndingTension;
 	private JComboBox comboBox1, comboBox2, comboBox3;
 	
-	private static ArrayList<Clip> softClips;
+	private static ArrayList<Clip>[] softClips = (ArrayList<Clip>[])new ArrayList[5];
 	
 
 	private String[] options = {"-7", "-6", "-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5", "6", "7"};
@@ -49,6 +51,8 @@ public class Frame1 {
 	private static int[] tension;
 	private static TensionModel tm;
 	private static int counter = 0;
+	private static String folderName[] = {"soft", "mediumSoft","medium","mediumLoud","loud"};
+	private Clip drums;
 
 	/**
 	 * Launch the application.
@@ -69,18 +73,23 @@ public class Frame1 {
 			
 		});
 		
-		
-		
-		softClips = new ArrayList<>();
+		for (int i = 0;i<5;i++)
+		{
+			softClips[i] = new ArrayList<>();
+		}
 		try{
-			for(int i = 0; i<7; i++)
+			for(int i = 1; i<22; i++)
 			{
-			Clip clip = AudioSystem.getClip();
-			clip.open(AudioSystem.getAudioInputStream(new File("C:\\EclipseWorkspace64\\Synthia\\sounds\\" + i + ".wav")));
-			softClips.add(clip);
-			Thread.sleep(clip.getMicrosecondLength()/1000);
+			
+			for (int j = 0;j<5;++j){
+				Clip clip = AudioSystem.getClip();
+				clip.open(AudioSystem.getAudioInputStream(new File("C:\\EclipseWorkspace64\\Synthia\\sounds\\"+folderName[j]+"\\" + i + ".wav")));
+				softClips[j].add(clip);
+				Thread.sleep(clip.getMicrosecondLength()/1000);
 			}
-			System.out.println(softClips.size());
+		
+			}
+			System.out.println(softClips[4].size());
 		} catch(Exception e) {
 			//error
 		}
@@ -142,7 +151,7 @@ public class Frame1 {
 		int difference = 0;
 		
 		//For our purposes, the a simple form of the algorithm executes over 4 measures
-		//(See Drive for full description of algorithm
+		//(See Drive for full description of algorithm)
 		for(int M = 1; M < 4; ++M){
 			tm.replicateMeasure(M);
 			tm.replicateVolume(M);
@@ -155,10 +164,16 @@ public class Frame1 {
 	}
 	
 	
-	public void start(){
+	public void start() throws IOException, LineUnavailableException, UnsupportedAudioFileException, InterruptedException{
+		
 		timer = new Timer();
 		initializeTimerTask();
 		timer.schedule(timerTask, 0, 1000);
+		drums = AudioSystem.getClip();
+		drums.open(AudioSystem.getAudioInputStream(new File("C:\\EclipseWorkspace64\\Synthia\\sounds\\d.wav")));
+		drums.loop(Clip.LOOP_CONTINUOUSLY);
+		drums.start();
+		Thread.sleep(drums.getMicrosecondLength()/1000);
 	}
 	
 	public void initializeTimerTask() {
@@ -171,20 +186,24 @@ public class Frame1 {
 				//if(currentPosition==randomPosition)
 				//softClips.get(randomPosition).setMicrosecondPosition(0);
 				
-				if (pitch > 6) pitch /= 4;
-				System.out.println(pitch + " size:" + softClips.size());
-				if (pitch != currentPosition){
-					softClips.get(pitch).start();
-					if (softClips.get(currentPosition).isRunning())
+				int volume = tm.getVolume(counter/16)+2;
+				
+				System.out.println(pitch + " size:" + softClips[volume].size());
+				if (pitch != 25){
+					softClips[volume].get(pitch).setMicrosecondPosition(0);
+					softClips[volume].get(pitch).start();
+					if (softClips[volume].get(currentPosition).isRunning())
 					{
-						softClips.get(currentPosition).setMicrosecondPosition(0);
-						softClips.get(currentPosition).stop();
+						softClips[volume].get(currentPosition).setMicrosecondPosition(0);
+						softClips[volume].get(currentPosition).stop();
 					}
 					currentPosition = pitch;
 				}
 				counter++;
 				if (counter >= 4*16)
 				{
+					drums.setMicrosecondPosition(0);
+					drums.stop();
 					timer.cancel();
 					counter = 0;
 				}
@@ -341,11 +360,26 @@ public class Frame1 {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				if(softClips.size()!=7)
+				if(softClips[4].size()!= 21){
 					JOptionPane.showMessageDialog(null, "Loading");
-				else
+					System.out.println(softClips[0].size() +" " +softClips[1].size() +" "+softClips[2].size() +" "+softClips[3].size() +" "+softClips[4].size());
+				}else
 				{
-					start();
+					try {
+						start();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (LineUnavailableException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (UnsupportedAudioFileException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					JOptionPane.showMessageDialog(null, "Beginning Tension is " + beginningTension + "\nMiddle Tension is " + middleTension + "\nEnding Tension is " + endingTension);
 				}
 			}
