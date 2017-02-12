@@ -1,4 +1,5 @@
 import java.applet.Applet;
+import java.io.*;
 import java.applet.AudioClip;
 import java.awt.EventQueue;
 import javax.swing.JFrame;
@@ -8,7 +9,6 @@ import javax.sound.sampled.Clip;
 import javax.swing.JButton;
 import java.awt.Font;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.net.URL;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
@@ -18,6 +18,7 @@ import java.applet.Applet;
 import java.applet.AudioClip;
 import java.net.URL;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -35,19 +36,23 @@ public class Frame1 {
 
 	private String[] options = {"-7", "-6", "-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5", "6", "7"};
 	
-	private int beginningTension, middleTension, endingTension;
+	private static int beginningTension;
+	private static int middleTension;
+	private static int endingTension;
 	private JComboBox comboBox_1;
 	private JComboBox comboBox;
 	private JLabel lblSynthia;
 	private JButton btnGenerateplay;
 	private Timer timer;
-    private TimerTask timerTask;
-    private int currentPosition;
+    	private TimerTask timerTask;
+    	private int currentPosition;
+	private static int[] tension;
+	private static TensionModel tm;
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) 
+	public static void main(String[] args) throws IOException
 	{
 		EventQueue.invokeLater(new Runnable() 
 		{
@@ -63,22 +68,20 @@ public class Frame1 {
 			
 		});
 		
-		//File file = new File("5.wav");
+		
+		
 		softClips = new ArrayList<>();
 		try{
-			for(int i = 0; i<12; i++)
+			for(int i = 0; i<7; i++)
 			{
 			Clip clip = AudioSystem.getClip();
 			clip.open(AudioSystem.getAudioInputStream(new File("C:\\EclipseWorkspace64\\Synthia\\sounds\\" + i + ".wav")));
 			softClips.add(clip);
-			//clip.start();
-			//JOptionPane.showMessageDialog(null, "It works");
 			Thread.sleep(clip.getMicrosecondLength()/1000);
 			}
 		} catch(Exception e) {
 			//error
 		}
-		//stringArray.add(new File("/Synthia/5.wav"));
 		
 	}
 
@@ -86,32 +89,105 @@ public class Frame1 {
 	 * Create the application.
 	 */
 	
-	public void startTimer(){
-        timer = new Timer();
+	public void start()
+	{
+		for(int i = 0; i < 4; ++i){
+			for(int j = 0; j < 16; ++j){
+				softClips.get(tm.getMIA(i, j)).start();
+			}
+		}
+	}
+	
+	
+	
+	public static void procedure() throws IOException
+	{
+		//start of tester
+				int[] seed = new int[16];
+				tension = new int[4];
+				int value;
+				
+				//Seed melody read from text file containing 16 integer values
+				System.out.println("Time signature 16/16; reading seed melody from file.");
+				
+				File file = new File("input.txt");
+				Scanner reader = new Scanner(file);
+				
+				for(int i = 0; i < 16; ++i){
+					seed[i] = reader.nextInt();
+				}
+				
+				reader.close();
+				reader = new Scanner(System.in);
+				
+				System.out.println("Four measures of music will be generated.\n" +
+									"The first measure will have a tension value of 0.\n");
+				
+				//Allowing the user to input desired tension values
+				tension[1] = beginningTension;
+				tension[2] = middleTension;
+				tension[3] = endingTension;
+				
+				//Creating the tension model object:
+				//First measure populated by seed melody
+				//Tension array populated by user input
+				//Volume array initially set to zero
+				tm = new TensionModel(seed, tension);
+				
+				generateMusic(tm);
+				
+				tm.printVolume();
+				tm.printMIA();
+				tm.printTension();
+				
+				reader.close();
+				
+				//end of tester
+	}
+	
 
-        initializeTimerTask();
-
-        timer.schedule(timerTask, 0, 500);
-    }
+	
+	public static void generateMusic(TensionModel tm){
+		int difference = 0;
+		
+		//For our purposes, the a simple form of the algorithm executes over 4 measures
+		//(See Drive for full description of algorithm
+		for(int M = 1; M < 4; ++M){
+			tm.replicateMeasure(M);
+			tm.replicateVolume(M);
+			
+			difference = tm.getTension(M) - tm.getTension(M - 1);
+			
+			tm.modifyMeasure(M, difference);
+			tm.setVolume(M, (float)((float)(2.0 * difference) / 7));
+		}
+	}
+	
+	
+	public void startRandom(){
+		timer = new Timer();
+		initializeTimerTask();
+		timer.schedule(timerTask, 0, 1000);
+	}
 	
 	public void initializeTimerTask() {
-        timerTask = new TimerTask() {
+		timerTask = new TimerTask() {
+			public void run() {
+				Random rng = new Random();
+				int randomPosition = rng.nextInt(softClips.size());
+				//if(currentPosition==randomPosition)
+				//softClips.get(randomPosition).setMicrosecondPosition(0);
+				softClips.get(randomPosition).start();
+				if (softClips.get(currentPosition).isRunning())
+				{
+					softClips.get(currentPosition).setMicrosecondPosition(0);
+					softClips.get(currentPosition).stop();
+				}
+				currentPosition = randomPosition;   
+			}
+		};
+	}
 
-            public void run() {
-            	 Random rng = new Random();
-                 int randomPosition = rng.nextInt(softClips.size());
-                   //if(currentPosition==randomPosition)
-                	  // softClips.get(currentPosition).setMicrosecondPosition(0);
-                 softClips.get(randomPosition).start();
-                 if (softClips.get(currentPosition).isRunning())
-                 {
-                	 softClips.get(currentPosition).setMicrosecondPosition(0);
-                     softClips.get(currentPosition).stop();
-                 }
-                 currentPosition = randomPosition;   
-            }
-        };
-    }
 	
 	public Frame1() {
 		initialize();
@@ -254,7 +330,13 @@ public class Frame1 {
 		btnGenerateplay.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JOptionPane.showMessageDialog(null, "Beginning Tension is " + beginningTension + "\nMiddle Tension is " + middleTension + "\nEnding Tension is " + endingTension);
-				startTimer();
+				try {
+					procedure();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				start();
 			}
 		});
 		btnGenerateplay.setFont(new Font("Good Times Rg", Font.BOLD, 16));
