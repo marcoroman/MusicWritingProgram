@@ -2,6 +2,7 @@ import java.io.*;
 import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
@@ -43,10 +44,13 @@ public class Frame1 {
     private TimerTask timerTask;
     private int currentPosition;
 	private static int[] tension;
+	private static int[] seed = new int[16];
 	private static TensionModel tm;
 	private static int counter = 0;
+	private String[] value = new String[16];
 	private static String folderName[] = {"soft", "mediumSoft","medium","mediumLoud","loud"};
 	private Clip drums;
+	private static boolean userUsingCustomSeed = false;
 
 	/**
 	 * Launch the application.
@@ -96,23 +100,28 @@ public class Frame1 {
 	
 	public static void procedure() throws IOException
 	{
-		//start of tester
-				int[] seed = new int[16];
+
 				tension = new int[4];
 				int value;
 				
+				//if user does not use custom seed values
 				//Seed melody read from text file containing 16 integer values
-				System.out.println("Time signature 16/16; reading seed melody from file.");
+				if(!userUsingCustomSeed)
+				{
+					System.out.println("Time signature 16/16; reading seed melody from file.");
 				
-				File file = new File("input.txt");
-				Scanner reader = new Scanner(file);
+					File file = new File("input.txt");
+					Scanner reader = new Scanner(file);
 				
-				for(int i = 0; i < 16; ++i){
-					seed[i] = reader.nextInt();
+					for(int i = 0; i < 16; ++i){
+						seed[i] = reader.nextInt();
+					}
+				
+					reader.close();
+					//reader = new Scanner(System.in);
 				}
-				
-				reader.close();
-				reader = new Scanner(System.in);
+				//end of if  
+				//else use seed values that user input
 				
 				System.out.println("Four measures of music will be generated.\n" +
 									"The first measure will have a tension value of 0.\n");
@@ -133,8 +142,6 @@ public class Frame1 {
 				tm.printVolume();
 				tm.printMIA();
 				tm.printTension();
-				
-				reader.close();
 				
 				//end of tester
 	}
@@ -173,14 +180,10 @@ public class Frame1 {
 	public void initializeTimerTask() {
 		timerTask = new TimerTask() {
 			public void run() {
-				
-				//Random rng = new Random();
-				//int randomPosition = rng.nextInt(softClips.size());
+
 				int pitch = tm.getMIA(counter/16, counter%16);
-				//if(pitch >=21)
-				//	pitch = 20;
-				//if(currentPosition==randomPosition)
-				//softClips.get(randomPosition).setMicrosecondPosition(0);
+				if((counter%16!=0) && pitch == tm.getMIA(counter/16, (counter%16)-1))
+					pitch = 25;
 				
 				int volume = tm.getVolume(counter/16)+2;
 				System.out.println("Volume value is " + volume);
@@ -235,7 +238,7 @@ public class Frame1 {
 		lblNewLabel.setBounds(27, 48, 46, 14);
 		frame.getContentPane().add(lblNewLabel);
 		
-		lblBeg = new JLabel("Beggining Tension");
+		lblBeg = new JLabel("Beginning Tension");
 		lblBeg.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblBeg.setBounds(27, 55, 174, 49);
 		frame.getContentPane().add(lblBeg);
@@ -361,7 +364,6 @@ public class Frame1 {
 				try {
 					procedure();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 				if(softClips[4].size()!= 21){
@@ -389,7 +391,95 @@ public class Frame1 {
 			}
 		});
 		btnGenerateplay.setFont(new Font("Good Times Rg", Font.BOLD, 16));
-		btnGenerateplay.setBounds(62, 156, 299, 113);
+		btnGenerateplay.setBounds(62, 191, 299, 113);
 		frame.getContentPane().add(btnGenerateplay);
+		
+		JButton btnAddCustomSeed = new JButton("Add Custom Seed (Optional)");
+		btnAddCustomSeed.setFont(new Font("Good Times Rg", Font.BOLD, 12));
+		btnAddCustomSeed.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JTextField field1 = new JTextField();
+				JTextField field2 = new JTextField();
+				JTextField field3 = new JTextField();
+				JTextField field4 = new JTextField();
+				JTextField field5 = new JTextField();
+				JTextField field6 = new JTextField();
+				JTextField field7 = new JTextField();
+				JTextField field8 = new JTextField();
+				JTextField field9 = new JTextField();
+				JTextField field10 = new JTextField();
+				JTextField field11 = new JTextField();
+				JTextField field12 = new JTextField();
+				JTextField field13 = new JTextField();
+				JTextField field14 = new JTextField();
+				JTextField field15 = new JTextField();
+				JTextField field16 = new JTextField();
+				Object[] message = {
+				    "Seed value 1:", field1,
+				    "Seed value 2:", field2,
+				    "Seed value 3:", field3,
+				    "Seed value 4:", field4,
+				    "Seed value 5:", field5,
+				    "Seed value 6:", field6,
+				    "Seed value 7:", field7,
+				    "Seed value 8:", field8,
+				    "Seed value 9:", field9,
+				    "Seed value 10:", field10,
+				    "Seed value 11:", field11,
+				    "Seed value 12:", field12,
+				    "Seed value 13:", field13,
+				    "Seed value 14:", field14,
+				    "Seed value 15:", field15,
+				    "Seed value 16:", field16,
+				};
+				int option = JOptionPane.showConfirmDialog(null, message, "Enter all your values", JOptionPane.OK_CANCEL_OPTION);
+				if (option == JOptionPane.OK_OPTION)
+				{
+				    value[0] = field1.getText();
+				    value[1] = field2.getText();
+				    value[2] = field3.getText();
+				    value[3] = field4.getText();
+				    value[4] = field5.getText();
+				    value[5] = field6.getText();
+				    value[6] = field7.getText();
+				    value[7] = field8.getText();
+				    value[8] = field9.getText();
+				    value[9] = field10.getText();
+				    value[10] = field11.getText();
+				    value[11] = field12.getText();
+				    value[12] = field13.getText();
+				    value[13] = field14.getText();
+				    value[14] = field15.getText();
+				    value[15] = field16.getText();
+				
+				
+				boolean errorExists = false;
+				
+			try
+			{	
+				for(int i = 0; i<seed.length; i++)
+				{
+					if(Integer.parseInt(value[i]) >= 0 && Integer.parseInt(value[i]) <= 7)
+					{
+					seed[i] = Integer.parseInt(value[i]) + 7;
+					}
+					else
+						errorExists = true;
+				}
+				
+				if(!errorExists)
+				userUsingCustomSeed = true;
+				else
+					JOptionPane.showMessageDialog(null, "User input error. \nNot all values are integers 0 to 7. \nDefault values will be used.");
+				
+			} catch(Exception e) {
+				JOptionPane.showMessageDialog(null, "User input error. \nNot all values are integers 0 to 7. \nDefault values will be used.");
+				}
+			}
+				
+			}
+		});
+		btnAddCustomSeed.setBounds(61, 148, 300, 32);
+		frame.getContentPane().add(btnAddCustomSeed);
 	}
 }
