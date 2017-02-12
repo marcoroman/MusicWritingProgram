@@ -17,7 +17,10 @@ public class TensionModel {
 		
 		tension = t;
 	}
-	
+	public int getVolume (int index)
+	{
+		return (int) volume[index];
+	}
 	//Prints volume array
 	public void printVolume(){
 		System.out.println("\nPrinting volume array:");
@@ -84,5 +87,10 @@ public class TensionModel {
 	//Returns a single user-specified value from tension array
 	public int getTension(int i){
 		return tension[i];
+	}
+	
+	//MIA accessor (one element at a time)
+	public int getMIA(int i, int j){
+		return MIA[i][j];
 	}
 }
