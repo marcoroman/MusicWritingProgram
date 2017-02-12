@@ -1,6 +1,4 @@
-import java.applet.Applet;
 import java.io.*;
-import java.applet.AudioClip;
 import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -16,10 +14,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 import javax.swing.JComboBox;
 import java.util.ArrayList;
-import java.applet.Applet;
-import java.applet.AudioClip;
-import java.net.URL;
-import java.util.Random;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
