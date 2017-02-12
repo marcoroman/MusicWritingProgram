@@ -183,21 +183,31 @@ public class Frame1 {
 				//Random rng = new Random();
 				//int randomPosition = rng.nextInt(softClips.size());
 				int pitch = tm.getMIA(counter/16, counter%16);
+				//if(pitch >=21)
+				//	pitch = 20;
 				//if(currentPosition==randomPosition)
 				//softClips.get(randomPosition).setMicrosecondPosition(0);
 				
 				int volume = tm.getVolume(counter/16)+2;
+				System.out.println("Volume value is " + volume);
 				
 				System.out.println(pitch + " size:" + softClips[volume].size());
-				if (pitch != 25){
-					softClips[volume].get(pitch).setMicrosecondPosition(0);
-					softClips[volume].get(pitch).start();
+				if (pitch == 0){
 					if (softClips[volume].get(currentPosition).isRunning())
 					{
 						softClips[volume].get(currentPosition).setMicrosecondPosition(0);
 						softClips[volume].get(currentPosition).stop();
 					}
-					currentPosition = pitch;
+				}
+				else if (pitch != 25){
+					softClips[volume].get(pitch-1).setMicrosecondPosition(0);
+					softClips[volume].get(pitch-1).start();
+					if (softClips[volume].get(currentPosition).isRunning())
+					{
+						softClips[volume].get(currentPosition).setMicrosecondPosition(0);
+						softClips[volume].get(currentPosition).stop();
+					}
+					currentPosition = pitch-1;
 				}
 				counter++;
 				if (counter >= 4*16)
