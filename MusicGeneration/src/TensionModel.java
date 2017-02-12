@@ -1,8 +1,7 @@
-
 public class TensionModel {
 	
 	private float[] volume = {0, 0, 0, 0};
-	//Note: MIA format is MIA[measure #][16th not in measure]
+	//Note: MIA format is MIA[measure #][16th note in measure]
 	private int[][] MIA = new int[4][16];
 	private int[] tension;
 	
@@ -58,7 +57,13 @@ public class TensionModel {
 	
 	//Allows the volume array to be modified
 	public void setVolume(int i, float level){
-		volume[i] += Math.round(level);
+		if(!(volume[i] + Math.round(level) > 2 || volume[i] + Math.round(level) < -2))
+			volume[i] += Math.round(level);
+	}
+	
+	//Copies volume from previous measure to current measure
+	public void replicateVolume(int measure){
+		volume[measure] = volume[measure - 1];
 	}
 	
 	//Sets measure i in MIA to measure i - 1

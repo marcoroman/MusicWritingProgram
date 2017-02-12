@@ -63,6 +63,7 @@ public class Tester {
 		//(See Drive for full description of algorithm
 		for(int M = 1; M < 4; ++M){
 			tm.replicateMeasure(M);
+			tm.replicateVolume(M);
 			
 			difference = tm.getTension(M) - tm.getTension(M - 1);
 			
