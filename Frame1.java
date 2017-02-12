@@ -44,10 +44,11 @@ public class Frame1 {
 	private JLabel lblSynthia;
 	private JButton btnGenerateplay;
 	private Timer timer;
-    	private TimerTask timerTask;
-    	private int currentPosition;
+    private TimerTask timerTask;
+    private int currentPosition;
 	private static int[] tension;
 	private static TensionModel tm;
+	private static int counter = 0;
 
 	/**
 	 * Launch the application.
@@ -79,6 +80,7 @@ public class Frame1 {
 			softClips.add(clip);
 			Thread.sleep(clip.getMicrosecondLength()/1000);
 			}
+			System.out.println(softClips.size());
 		} catch(Exception e) {
 			//error
 		}
@@ -88,17 +90,6 @@ public class Frame1 {
 	/**
 	 * Create the application.
 	 */
-	
-	public void start()
-	{
-		for(int i = 0; i < 4; ++i){
-			for(int j = 0; j < 16; ++j){
-				softClips.get(tm.getMIA(i, j)).start();
-			}
-		}
-	}
-	
-	
 	
 	public static void procedure() throws IOException
 	{
@@ -164,7 +155,7 @@ public class Frame1 {
 	}
 	
 	
-	public void startRandom(){
+	public void start(){
 		timer = new Timer();
 		initializeTimerTask();
 		timer.schedule(timerTask, 0, 1000);
@@ -173,17 +164,31 @@ public class Frame1 {
 	public void initializeTimerTask() {
 		timerTask = new TimerTask() {
 			public void run() {
-				Random rng = new Random();
-				int randomPosition = rng.nextInt(softClips.size());
+				
+				//Random rng = new Random();
+				//int randomPosition = rng.nextInt(softClips.size());
+				int pitch = tm.getMIA(counter/16, counter%16);
 				//if(currentPosition==randomPosition)
 				//softClips.get(randomPosition).setMicrosecondPosition(0);
-				softClips.get(randomPosition).start();
-				if (softClips.get(currentPosition).isRunning())
-				{
-					softClips.get(currentPosition).setMicrosecondPosition(0);
-					softClips.get(currentPosition).stop();
+				
+				if (pitch > 6) pitch /= 4;
+				System.out.println(pitch + " size:" + softClips.size());
+				if (pitch != currentPosition){
+					softClips.get(pitch).start();
+					if (softClips.get(currentPosition).isRunning())
+					{
+						softClips.get(currentPosition).setMicrosecondPosition(0);
+						softClips.get(currentPosition).stop();
+					}
+					currentPosition = pitch;
 				}
-				currentPosition = randomPosition;   
+				counter++;
+				if (counter >= 4*16)
+				{
+					timer.cancel();
+					counter = 0;
+				}
+				   
 			}
 		};
 	}
@@ -329,14 +334,20 @@ public class Frame1 {
 		btnGenerateplay = new JButton("Generate/Play");
 		btnGenerateplay.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null, "Beginning Tension is " + beginningTension + "\nMiddle Tension is " + middleTension + "\nEnding Tension is " + endingTension);
+				
 				try {
 					procedure();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				start();
+				if(softClips.size()!=7)
+					JOptionPane.showMessageDialog(null, "Loading");
+				else
+				{
+					start();
+					JOptionPane.showMessageDialog(null, "Beginning Tension is " + beginningTension + "\nMiddle Tension is " + middleTension + "\nEnding Tension is " + endingTension);
+				}
 			}
 		});
 		btnGenerateplay.setFont(new Font("Good Times Rg", Font.BOLD, 16));
