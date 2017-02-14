@@ -477,6 +477,7 @@ public class Frame1 {
 					errorExists = true;
 					JOptionPane.showMessageDialog(null, "User input error. \nNot all values were an uppercase character note. \nDefault values will be used.");
 				}
+				userUsingCustomSeed = true;
 			} else {
 			try
 			{	
