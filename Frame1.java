@@ -10,7 +10,6 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JButton;
 import java.awt.Font;
 import java.awt.event.ActionListener;
-import java.net.URL;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 import javax.swing.JComboBox;
@@ -37,8 +36,6 @@ public class Frame1 {
 	private static int beginningTension;
 	private static int middleTension;
 	private static int endingTension;
-	private JComboBox comboBox_1;
-	private JComboBox comboBox;
 	private JLabel lblSynthia;
 	private JButton btnGenerateplay;
 	private Timer timer;
@@ -170,7 +167,7 @@ public class Frame1 {
 		
 		timer = new Timer();
 		initializeTimerTask();
-		timer.schedule(timerTask, 0, 00);
+		timer.schedule(timerTask, 0, 800);
 		drums = AudioSystem.getClip();
 		drums.open(AudioSystem.getAudioInputStream(new File("C:\\EclipseWorkspace64\\Synthia\\sounds\\d.wav")));
 		drums.loop(Clip.LOOP_CONTINUOUSLY);
@@ -386,7 +383,7 @@ public class Frame1 {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-					JOptionPane.showMessageDialog(null, "Beginning Tension is " + beginningTension + "\nMiddle Tension is " + middleTension + "\nEnding Tension is " + endingTension);
+					//JOptionPane.showMessageDialog(null, "Beginning Tension is " + beginningTension + "\nMiddle Tension is " + middleTension + "\nEnding Tension is " + endingTension);
 				}
 			}
 		});
@@ -452,9 +449,35 @@ public class Frame1 {
 				    value[14] = field15.getText();
 				    value[15] = field16.getText();
 				
-				
-				boolean errorExists = false;
-				
+			boolean errorExists = false;
+			
+			if(Character.isUpperCase(value[0].charAt(0)))
+			{
+				try
+				{
+					for(int i = 0; i<seed.length; i++)
+					{
+						String str = value[i];
+						switch(str)
+						{
+						case "C": seed[i] = 8; break;
+						case "D": seed[i] = 9; break;
+						case "E": seed[i] = 10; break;
+						case "F": seed[i] = 11; break;
+						case "G": seed[i] = 12; break;
+						case "A": seed[i] = 13; break;
+						case "B": seed[i] = 14; break;
+						default: 
+							errorExists = true;
+							JOptionPane.showMessageDialog(null, "An error exists!");
+							break;
+						}
+					}
+				} catch(Exception e) {
+					errorExists = true;
+					JOptionPane.showMessageDialog(null, "User input error. \nNot all values were an uppercase character note. \nDefault values will be used.");
+				}
+			} else {
 			try
 			{	
 				for(int i = 0; i<seed.length; i++)
@@ -474,10 +497,16 @@ public class Frame1 {
 				if(!errorExists)
 				userUsingCustomSeed = true;
 				else
+				{
+					errorExists = true;
 					JOptionPane.showMessageDialog(null, "User input error. \nNot all values are integers 0 to 7. \nDefault values will be used.");
+				}
 				
-			} catch(Exception e) {
-				JOptionPane.showMessageDialog(null, "User input error. \nNot all values are integers 0 to 7. \nDefault values will be used.");
+			} catch(Exception e)
+					{
+					errorExists = true;
+					JOptionPane.showMessageDialog(null, "User input error. \nNot all values are integers 0 to 7. \nDefault values will be used.");
+					}
 				}
 			}
 				
